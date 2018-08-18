@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from Perceptron.Perceptron import Model as Perceptron
-from Ploter import plot_decision_regions
+from Ploting.Ploter import plot_decision_regions
 
 df = pd.read_csv(
     'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', header=None)
@@ -21,14 +21,14 @@ plt.ylabel('petal length [cm]')
 plt.legend(loc='upper left')
 plt.show()
 
-pcp = Perceptron(iterations_count=10)
-pcp.fit(X, y)
-plt.plot(range(1, len(pcp.errors_)+1), pcp.errors_, marker='o')
+model = Perceptron(iterations_count=10)
+model.fit(X, y)
+plt.plot(range(1, len(model.errors_)+1), model.errors_, marker='o')
 plt.xlabel('Epochs')
 plt.ylabel('Number of updates')
 plt.show()
 
-plot_decision_regions(X, y, classifier=pcp)
+plot_decision_regions(X, y, classifier=model)
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
 plt.legend(loc='upper left')
