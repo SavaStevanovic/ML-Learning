@@ -3,25 +3,52 @@ import numpy as np
 
 class Model():
 
-    def __init__(self, learning_rate=0.01, iterations_count=50, seed=1):
+    def __init__(self, learning_rate=0.01, iterations_count=50, shuffle_data=True, seed=1):
         self.learning_rate = learning_rate
         self.iterations_count = iterations_count
         self.seed = seed
+        self.shuffle_data = shuffle_data
+        self.w_initialized = False
 
     def fit(self, X, y):
-        rgen = np.random.RandomState(self.seed)
-        self.w_ = rgen.normal(loc=0.0, scale=0.01, size=1 + X.shape[1])
+        self.initialise_weights(X.shape[1])
         self.cost_ = []
 
         for _ in range(self.iterations_count):
-            net_input = self.network_input(X)
-            net_output = self.activation(net_input)
-            errors = y - net_output
-            self.w_[1:] += self.learning_rate*X.T.dot(errors)
-            self.w_[0] += self.learning_rate*sum(errors)
-            cost = (errors**2).sum()/2
-            self.cost_.append(cost)
+            if(self.shuffle_data):
+                X, y = self.shuffle(X, y)
+            cost = []
+            for xi, target in zip(X, y):
+                cost.append(self.update_weights(xi, target))
+            self.cost_.append(np.average(cost))
         return self
+
+    def partial_fit(self, X, y):
+        if not self.w_initialized:
+            self.initialise_weights(X.shape[1])
+        if y.ravel().shape[0] > 1:
+            for xi, yi in zip(X, y):
+                self.update_weights(xi, yi)
+        else:
+            self.update_weights(X, y)
+        return self
+
+    def shuffle(self, X, y):
+        permutation = self.rgen.permutation(len(y))
+        return X[permutation], y[permutation]
+
+    def initialise_weights(self, len):
+        self.rgen = np.random.RandomState(self.seed)
+        self.w_ = self.rgen.normal(loc=0.0, scale=0.01, size=1 + len)
+        self.w_initialized = True
+
+    def update_weights(self, xi, target):
+        yi = self.activation(self.network_input(xi))
+        error = target-yi
+        self.w_[1:] += self.learning_rate*xi.dot(error)
+        self.w_[0] += self.learning_rate*error
+        cost = 0.5*error**2
+        return cost
 
     def network_input(self, X):
         return np.dot(X, self.w_[1:])+self.w_[0]
