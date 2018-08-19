@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Model():
 
     def __init__(self, learning_rate=0.01, iterations_count=50, seed=1):
@@ -14,18 +15,18 @@ class Model():
 
         for _ in range(self.iterations_count):
             net_input = self.network_input(X)
-            net_output=self.activation(net_input)
+            net_output = self.activation(net_input)
             errors = y - net_output
             self.w_[1:] += self.learning_rate*X.T.dot(errors)
             self.w_[0] += self.learning_rate*sum(errors)
-            cost=(errors**2).sum()/2
-            self.cost_.append(cost);     
+            cost = (errors**2).sum()/2
+            self.cost_.append(cost)
         return self
 
     def network_input(self, X):
         return np.dot(X, self.w_[1:])+self.w_[0]
 
-    def activation(self,X):
+    def activation(self, X):
         return X
 
     def predict(self, X):

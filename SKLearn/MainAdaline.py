@@ -3,14 +3,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Adaline.Adaline import Model as Adaline
 from Ploting.Ploter import plot_decision_regions
+from Preprocessing.Preprocessing import normalize
 
-def PlotModel(ax,learning_rate):
-    model=Adaline(iterations_count=10,learning_rate=learning_rate)
-    model.fit(X,y)
+
+def MultyPlotModel(ax, learning_rate, X, y):
+    model = Adaline(iterations_count=10, learning_rate=learning_rate)
+    model.fit(X, y)
     ax.plot(range(1, len(model.cost_)+1), np.log(model.cost_), marker='o')
     ax.set_xlabel('Epochs')
-    ax.set_ylabel('log(Sum-squared-error)')
+    ax.set_ylabel('Error')
     ax.set_title("Adaline - Learning rate %s" % learning_rate)
+
+
+def PlotModel(learning_rate, X, y, iterations_count):
+    model = Adaline(iterations_count=iterations_count,
+                    learning_rate=learning_rate)
+    model.fit(X, y)
+
+    plot_decision_regions(X, y, model)
+
+    plt.plot(range(1, len(model.cost_)+1), np.log(model.cost_), marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Error')
+    plt.title("Adaline - Learning rate %s" % learning_rate)
+    plt.show()
+
+    plt.plot(range(1, len(model.cost_)+1), np.log(model.cost_), marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('Error')
+    plt.show()
+
 
 df = pd.read_csv(
     'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', header=None)
@@ -21,13 +43,15 @@ y = np.where(y == 'Iris-setosa', -1, 1)
 
 X = df.iloc[:100, [0, 2]].values
 
-fig, ax=plt.subplots(nrows=1,ncols=2,figsize=(10,4))
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
 
-learning_rate=0.01
-PlotModel(ax[0],learning_rate)
+learning_rate = 0.01
+MultyPlotModel(ax[0], learning_rate, X, y)
 
-learning_rate=0.0001
-PlotModel(ax[1],learning_rate)
+learning_rate = 0.0001
+MultyPlotModel(ax[1], learning_rate, X, y)
 plt.show()
 
-
+X_norm = normalize(X)
+learning_rate = 0.01
+PlotModel(learning_rate, X_norm, y, 15)
