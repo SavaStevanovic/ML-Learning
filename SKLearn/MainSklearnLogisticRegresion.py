@@ -25,8 +25,21 @@ standardScaler.fit(X_train)
 X_train_std = standardScaler.transform(X_train)
 X_test_std = standardScaler.transform(X_test)
 
-model = LogisticRegression(C=100., random_state=1)
-model.fit(X_train_std, y_train)
+weights, params = [], []
+
+for c in np.arange(-5, 5):
+    model = LogisticRegression(C=10.**c, random_state=1)
+    model.fit(X_train_std, y_train)
+    weights.append(model.coef_[1])
+    params.append(100.**c)
+weights = np.array(weights)
+plt.plot(params, weights[:, 0], label='petal length')
+plt.plot(params,weights[:,1],linestyle='--', label='petal width')
+plt.xlabel('weight coefficient')
+plt.ylabel('C')
+plt.legend(loc='upper left')
+plt.xscale('log')
+plt.show()
 
 X_combined_std = np.vstack((X_train_std, X_test_std))
 y_combined = np.hstack((y_train, y_test))
