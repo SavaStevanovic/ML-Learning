@@ -25,7 +25,7 @@ standardScaler.fit(X_train)
 X_train_std = standardScaler.transform(X_train)
 X_test_std = standardScaler.transform(X_test)
 
-model = SVC(kernel='linear', C=1., random_state=1)
+model = SVC(kernel='rbf', C=5., random_state=1, gamma=1)
 model.fit(X_train_std, y_train)
 
 X_combined_std = np.vstack((X_train_std, X_test_std))
