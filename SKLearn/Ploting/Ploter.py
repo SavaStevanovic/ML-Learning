@@ -4,6 +4,8 @@ from matplotlib.colors import ListedColormap
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
 
 def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
@@ -61,8 +63,8 @@ def iris_model_testing(model):
     y_combined = np.hstack((y_train, y_test))
     plot_decision_regions(X=X_combined_std, y=y_combined,
                           classifier=model, test_idx=range(105, 150))
-    plt.xlabel('sepal length [normalized]')
-    plt.ylabel('petal length [normalized]')
+    plt.xlabel('sepal length [standardized]')
+    plt.ylabel('petal length [standardized]')
     plt.legend(loc='upper left')
     plt.show()
 
@@ -78,3 +80,11 @@ def wine_model_testing(model):
     y = df_wine.iloc[:, 0].values
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=0, stratify=y)
+    scaler = StandardScaler()
+    X_train_norm = scaler.fit_transform(X_train)
+    X_test_norm = scaler.transform(X_test)
+    model.fit(X_train_norm, y_train)
+    print("Test accuracy:",
+          model.score(X_test_norm, y_test))
+    print(model.intercept_)
+    print(model.coef_)

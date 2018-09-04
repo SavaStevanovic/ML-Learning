@@ -22,8 +22,8 @@ def PlotModel(learning_rate, X, y, iterations_count):
     model.fit(X, y)
 
     plot_decision_regions(X, y, model)
-    plt.xlabel('sepal length [normalized]')
-    plt.ylabel('petal length [normalized]')
+    plt.xlabel('sepal length [standardized]')
+    plt.ylabel('petal length [standardized]')
     plt.title("Adaline - Learning rate %s" % learning_rate)
     plt.show()
 

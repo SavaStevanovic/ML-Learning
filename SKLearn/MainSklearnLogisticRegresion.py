@@ -2,6 +2,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from Ploting.Ploter import plot_decision_regions
+from Ploting.Ploter import wine_model_testing
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,7 +35,7 @@ for c in np.arange(-5, 5):
     params.append(100.**c)
 weights = np.array(weights)
 plt.plot(params, weights[:, 0], label='petal length')
-plt.plot(params,weights[:,1],linestyle='--', label='petal width')
+plt.plot(params, weights[:, 1], linestyle='--', label='petal width')
 plt.xlabel('weight coefficient')
 plt.ylabel('C')
 plt.legend(loc='upper left')
@@ -50,3 +51,6 @@ plt.xlabel('petal length [standardized]')
 plt.ylabel('petal width [standardized]')
 plt.legend(loc='upper left')
 plt.show()
+
+model = LogisticRegression(penalty='l1', C=1.)
+wine_model_testing(model)
