@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import StandardScaler
 import pandas as pd
+from DimensionReduction.FeatureSelection.SequentialBackwardSelection import SBS
 
 
 def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
@@ -81,10 +82,26 @@ def wine_model_testing(model):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=0, stratify=y)
     scaler = StandardScaler()
-    X_train_norm = scaler.fit_transform(X_train)
-    X_test_norm = scaler.transform(X_test)
-    model.fit(X_train_norm, y_train)
-    print("Test accuracy:",
-          model.score(X_test_norm, y_test))
-    print(model.intercept_)
-    print(model.coef_)
+    X_train_std = scaler.fit_transform(X_train)
+    X_test_std = scaler.transform(X_test)
+
+    model.fit(X_train_std, y_train)
+    print("Trainiong accuracy:", model.score(X_train_std, y_train))
+    print("Test accuracy:", model.score(X_test_std, y_test))
+
+    sbs = SBS(model, k_features=1)
+    sbs.fit(X_train_std, y_train)
+    k_features = [len(k) for k in sbs.subsets_]
+    plt.plot(k_features, sbs.scores_, marker='o')
+    plt.ylim(0.7, 1.02)
+    plt.xlabel('Accuracy')
+    plt.ylabel('Number of features')
+    plt.grid()
+    plt.show()
+    k_best = np.argmax(list(reversed(sbs.scores_)))
+    best_features_indeces = list(list(reversed(sbs.subsets_))[k_best])
+    print(df_wine.columns[1:][best_features_indeces])
+
+    model.fit(X_train_std[:, best_features_indeces], y_train)
+    print("Trainiong accuracy:", model.score(X_train_std[:, best_features_indeces], y_train))
+    print("Test accuracy:", model.score(X_test_std[:, best_features_indeces], y_test))
