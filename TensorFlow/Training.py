@@ -40,3 +40,45 @@ def predict_model(sess, model, X_test):
     y_pred = sess.run(model.z_net,
                       feed_dict={model.X: X_test})
     return y_pred
+
+
+def train(sess, training_set, validation_set=None, initialize=True, epochs=20, shuffle=True, dropout=0.5, random_seed=None):
+
+    X_data = np.array(training_set[0])
+    y_data = np.array(training_set[1])
+    training_loss = []
+
+    if initialize:
+        sess.run(tf.global_variables_initializer())
+
+    np.random.seed(random_seed)
+    for epoch in range(1, epochs+1):
+        batch_gen = db.create_batch_generator(X_data, y_data, shuffle=shuffle)
+
+        avg_loss = 0.0
+        for i, (batch_x, batch_y) in enumerate(batch_gen):
+            feed = {'tf_x:0': batch_x, 'tf_y:0': batch_y,
+                    'fc_keep_prob:0': dropout}
+
+            loss, _ = sess.run(
+                ['cross_entropy_loss:0', 'train_op'], feed_dict=feed)
+            avg_loss += loss
+
+        training_loss.append(avg_loss/(i+1))
+        print('Epoch %02d Training Avg. Loss: %7.3f' %
+              (epoch, avg_loss), end=' ')
+
+        if validation_set is not None:
+            feed = {'tf_x:0': validation_set[0], 'tf_y:0': validation_set[1],
+                    'fc_keep_prob:0': 1.}
+            validation_acc = sess.run('accuracy:0', feed_dict=feed)
+            print(' Validation Acc: %7.3f' % validation_acc)
+        else:
+            print()
+
+
+def predict(sess, X_test, return_proba=False):
+    feed = {'tf_x:0': X_test, 'fc_keep_prob:0': 1.}
+    if return_proba:
+        return sess.run('probabilities:0', feed_dict=feed)
+    return sess.run('labels:0', feed_dict=feed)
