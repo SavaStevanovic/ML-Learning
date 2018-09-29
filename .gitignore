@@ -106,3 +106,8 @@ graphs/
 trained-models/
 tflayers-model/
 model/
+*.index
+*.meta
+*.data-00000-of-00001
+model-200/
+model-100/
